@@ -1,0 +1,19 @@
+# EDA
+pandas
+numpy
+matplotlib
+seaborn
+scipy
+jupyter
+
+# API e Persistência
+fastapi[standard]
+python-multipart
+pyjwt
+sqlmodel
+passlib[bcrypt]
+bcrypt
+slowapi
+
+# TESTES
+pytest
