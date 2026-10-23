@@ -1,81 +1,104 @@
-# TP2 — Análise e Segurança de Agentes de IA
+# TP3 — Análise e Segurança de Agentes de IA
 
-Projeto de Bloco: Análise e Segurança de Agentes de IA. Este repositório contém a
-segunda entrega (TP2), que reúne a análise exploratória completa do
-**Customer Support Ticket Dataset** (com correlação, análise multivariada e testes
-de hipóteses formais com SciPy) e a evolução da API FastAPI com controles de segurança
-defensiva baseados no OWASP Top 10, persistência com SQLite/SQLModel, rate limiting,
-testes automatizados e auditoria passiva com OWASP ZAP.
+Projeto de Bloco: Análise e Segurança de Agentes de IA.
+
+Este repositório contém a terceira entrega do projeto, desenvolvida a partir do TP2 utilizando o **Customer Support Ticket Dataset**. Nesta etapa foram adicionados o experimento de regressão linear, a formalização do problema de classificação, novos testes de segurança, integração contínua com GitHub Actions e a auditoria final da API com OWASP ZAP.
 
 ## Objetivo
 
-Completar a análise exploratória do **Customer Support Ticket Dataset** — incluindo correlações, testes de hipótese formais e visualizações com SciPy — e evoluir a API FastAPI aplicando controles defensivos do OWASP Top 10 (persistência com SQLite/SQLModel, proteção contra BOLA, validação de campos com `extra='forbid'`, headers de segurança e rate limiting), preparando a aplicação para ser auditada via OWASP ZAP e testada com Pytest.
+Consolidar a análise estatística realizada nos TPs anteriores e preparar o projeto para a etapa de classificação de intenções, mantendo a API FastAPI com os controles de segurança e testes automatizados desenvolvidos ao longo do projeto.
 
 ## Estrutura de pastas
 
-```
+```text
 .
-├── README.md             Este arquivo
-├── requirements.txt      Dependências do projeto
-├── data/                 customer_support_tickets.csv (dataset do tp)
-├── eda/                  Exatamente um arquivo .ipynb com o EDA completo
-├── fastapi/              Código-fonte modular da API
-│ ├── database.db         Banco de dados SQLite persistido
-│ ├── sqlite_database.py  Script para criação e população inicial do banco
-│ ├── main.py             Ponto de entrada da aplicação FastAPI
-│ ├── routes/             Definição modular dos endpoints
-│ ├── models/             Modelos Pydantic (extra='forbid') e classes SQLModel
-│ └── security/           Autenticação JWT, middlewares de segurança e rate limiting
-├── tests/                Suíte de testes automatizados com pytest
-└── zap/                  Relatório do scan passivo OWASP ZAP e scan_passivo_zap.md
+├── README.md
+├── requirements.txt
+├── data/
+│   └── customer_support_tickets.csv
+├── eda/
+│   └── eda_tp3.ipynb
+├── fastapi/
+│   ├── database.db
+│   ├── sqlite_database.py
+│   ├── sqlite_populate.py
+│   ├── main.py
+│   ├── routes/
+│   ├── models/
+│   └── security/
+├── tests/
+├── zap/
+│   └── scan_passivo_zap_TP3.md
+├── others/
+│   └── planejamento.md
+│   └── ...        Documentos complementares do projeto
+└── .github/
+    └── workflows/
+        └── testes.yml
 ```
 
 ## Instalação
 
-Requer Python 3.10 ou superior. Recomendado usar um ambiente virtual.
+Requer Python 3.10 ou superior. Recomenda-se utilizar um ambiente virtual.
 
 ```bash
-python -m venv venv
-# Windows
-venv\Scripts\activate
-# Linux/Mac
-source venv/bin/activate
+python -m venv .venv
+```
 
+### Windows
+
+```bash
+.venv\Scripts\activate
+```
+
+### Linux/macOS
+
+```bash
+source .venv/bin/activate
+```
+
+Instale as dependências:
+
+```bash
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### Criação e População do Banco de Dados
+## Banco de dados
 
-Antes de iniciar a API pela primeira vez, execute o script para criar as tabelas e
-popular o banco SQLite com usuários e predições iniciais vinculadas por `owner_id`:
+O projeto utiliza SQLite.
+
+Para criar o banco:
 
 ```bash
 python fastapi/sqlite_database.py
 ```
 
-O banco `database.db` será gerado automaticamente dentro do diretório `fastapi/`.
-
-O banco já vem populado com 3 usuários de demonstração (senhas armazenadas como hash bcrypt) e 4 predições de donos diferentes:
-
-| Usuário | Senha | Predições (id) |
-|---|---|---|
-| `admin` | `admin` | 1, 2 |
-| `jose` | `1234` | 3 |
-| `maria` | `senha123` | 4 |
-
-Exemplo de login: `POST /auth/token` com `username` e `password` em formulário (`application/x-www-form-urlencoded`). Use o `access_token` retornado no header `Authorization: Bearer <token>`.
-
-### Como executar o EDA
-
-O notebook está em `eda/`. Dá pra abrir no Jupyter ou no Google Colab. Se rodar local:
+Para realizar a população inicial:
 
 ```bash
-jupyter notebook eda/eda_completo.ipynb
+python fastapi/sqlite_populate.py
 ```
 
-O CSV é carregado via caminho relativo diretamente da pasta `data/`.
+O arquivo `database.db` fica localizado dentro de `fastapi/` e contém usuários e predições de exemplo pertencentes a usuários diferentes.
 
-### Como executar a API
+## EDA
+
+O notebook com as etapas dos TP1, TP2 e TP3 está em:
+
+```text
+eda/eda_tp3.ipynb
+```
+
+Para executá-lo localmente:
+
+```bash
+jupyter notebook eda/eda_tp3.ipynb
+```
+
+Nesta etapa foram acrescentados o experimento de regressão linear, as métricas R² e RMSE, Residual Plot, Q-Q Plot e a formalização do problema de classificação de intenções.
+
+## API
 
 A partir da pasta `fastapi/`:
 
@@ -83,55 +106,78 @@ A partir da pasta `fastapi/`:
 uvicorn main:app --reload
 ```
 
-A API sobe em `http://127.0.0.1:8000`. A documentação interativa (Swagger) fica em
-`http://127.0.0.1:8000/docs`.
+A API ficará disponível em:
 
-Recursos e controles implementados na API:
+```text
+http://127.0.0.1:8000
+```
 
-- `GET /health` — verifica a integridade e status da API.
+Swagger:
 
-- `POST /auth/token` — autentica usuários cadastrados no banco (senhas armazenadas com hash bcrypt) e emite token JWT. Limitado a 10 requisições por minuto por cliente.
+```text
+http://127.0.0.1:8000/docs
+```
 
-- `POST /predict` — endpoint protegido por JWT que classifica a mensagem e salva a predição com o `owner_id` do usuário autenticado. O body é validado com `extra='forbid'`: campos extras retornam 422.
+Principais rotas:
 
-- `GET /predict/{id}` — consulta de predição por ID com validação de ownership (prevenção contra BOLA): se a predição pertence a outro usuário, a API responde 404, igual a uma predição inexistente.
+- `GET /health`
+- `POST /auth/token`
+- `POST /predict`
+- `GET /predict/{id}`
 
-- Middlewares globais injetando headers de segurança (HSTS, CSP, X-Frame-Options, X-Content-Type-Options) e CORS com allowlist explícita.
+A API utiliza autenticação JWT, validação de ownership para prevenção de BOLA, modelos Pydantic com `extra='forbid'`, CORS com allowlist, headers HTTP de segurança e rate limiting no endpoint de autenticação.
 
-#### Headers de segurança HTTP
+## Testes automatizados
 
-Implementados em `fastapi/security/headers.py` por meio de middleware FastAPI, presentes em todas as respostas (inclusive nas de erro 401 e 429):
+Os testes estão localizados em `tests/` e utilizam `pytest` e o `TestClient` do FastAPI.
 
-| Header | Valor | Objetivo |
-|---|---|---|
-| `Strict-Transport-Security` | `max-age=31536000; includeSubDomains` | Força HTTPS em acessos seguintes |
-| `X-Frame-Options` | `DENY` | Bloqueia uso da API em iframe (clickjacking) |
-| `X-Content-Type-Options` | `nosniff` | Impede MIME sniffing |
-| `Content-Security-Policy` | `default-src 'none'; frame-ancestors 'none'` | Respostas da API não carregam nem embutem nenhum recurso |
+A suíte cobre cenários de autenticação, autorização/BOLA, validação de entrada, rate limiting e acesso a rotas protegidas.
 
-As rotas `/docs` e `/redoc` usam uma CSP menos restritiva, que libera apenas o CDN `cdn.jsdelivr.net`, necessário para o Swagger funcionar.
-
-#### CORS
-
-Configurado em `fastapi/security/cors.py` com `CORSMiddleware` e allowlist explícita de origens (`http://localhost:3000` e `http://localhost:8501`, também em `127.0.0.1`). Não é usado `"*"`. Métodos permitidos: `GET`, `POST`, `OPTIONS`. Headers permitidos: `Authorization` e `Content-Type`. Origens adicionais podem ser informadas na variável de ambiente `CORS_ORIGENS_EXTRAS`, separadas por vírgula.
-
-#### Rate limiting
-
-Implementado com SlowAPI em `fastapi/security/rate_limit.py` e aplicado ao endpoint `POST /auth/token`.
-
-- **Limite:** 10 requisições por minuto por cliente (identificado pelo IP).
-- **Resposta ao exceder:** HTTP `429`.
-- **Justificativa:** 10 tentativas por minuto atendem um usuário legítimo que erra a senha algumas vezes, mas limitam um ataque de força bruta a no máximo 600 tentativas por hora por IP.
-- **Observação:** o contador fica em memória, então reinicia quando a API reinicia. Nos testes automatizados, é preciso chamar `limiter.reset()` entre os testes que usam `/auth/token`.
-
-### Como executar os testes automatizados
-
-Os testes cobrem os cenários de segurança exigidos (acesso sem token, violação de
-ownership/BOLA e envio de campos extras não mapeados):
+Para executar:
 
 ```bash
 pytest tests/ -v
 ```
+
+## GitHub Actions
+
+O workflow de integração contínua está em:
+
+```text
+.github/workflows/testes.yml
+```
+
+A cada push, o GitHub Actions instala as dependências do projeto e executa:
+
+```bash
+pytest tests/ -v
+```
+
+As execuções podem ser acompanhadas na aba **Actions** do repositório.
+
+## OWASP ZAP
+
+A auditoria final da API é realizada com OWASP ZAP.
+
+O relatório exportado fica na pasta `zap/` e a análise dos findings Medium e High está documentada em:
+
+```text
+zap/scan_passivo_zap_TP3.md
+```
+
+## Cloudflare Tunnel
+
+Para disponibilizar temporariamente a API por HTTPS durante a preparação dos testes adversariais, foi utilizado o Cloudflare Tunnel:
+
+```bash
+cloudflared tunnel --url http://localhost:8000
+```
+
+A URL gerada no TP3 está registrada em `others/planejamento.md`.
+
+## Repositório
+
+https://github.com/Raquelbraga242/luisa_julia_raquel_gustavo_pb_tp3
 
 ## Integrantes
 
