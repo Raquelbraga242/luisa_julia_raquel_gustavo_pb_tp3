@@ -30,7 +30,7 @@ Consolidar a análise estatística realizada nos TPs anteriores e preparar o pro
 ├── zap/
 │   └── scan_passivo_zap_TP3.md
 ├── others/
-│   └── planejamento.md
+│   └── planejamento_tp3.md
 │   └── ...        Documentos complementares do projeto
 └── .github/
     └── workflows/
