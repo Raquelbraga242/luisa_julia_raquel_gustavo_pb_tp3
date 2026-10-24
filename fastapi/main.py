@@ -12,7 +12,9 @@ from security.rate_limit import limiter
 
 
 app = FastAPI(
-    title="Customer Support API"
+    title="Customer Support API",
+    description="API para classificação de intenções de chamados de suporte com autenticação JWT.",
+    version="1.0.0",
 )
 
 # Rate limiting (SlowAPI): o limiter precisa estar em app.state e o handler
