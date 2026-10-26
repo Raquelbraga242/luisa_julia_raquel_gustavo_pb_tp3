@@ -5,6 +5,7 @@ matplotlib
 seaborn
 scipy
 jupyter
+scikit-learn
 
 # API e Persistência
 fastapi[standard]

@@ -21,7 +21,6 @@ Consolidar a análise estatística realizada nos TPs anteriores e preparar o pro
 ├── fastapi/
 │   ├── database.db
 │   ├── sqlite_database.py
-│   ├── sqlite_populate.py
 │   ├── main.py
 │   ├── routes/
 │   ├── models/
@@ -30,7 +29,7 @@ Consolidar a análise estatística realizada nos TPs anteriores e preparar o pro
 ├── zap/
 │   └── scan_passivo_zap_TP3.md
 ├── others/
-│   └── planejamento_tp3.md
+│   └── planejamento.md
 │   └── ...        Documentos complementares do projeto
 └── .github/
     └── workflows/
@@ -68,16 +67,10 @@ pip install -r requirements.txt
 
 O projeto utiliza SQLite.
 
-Para criar o banco:
+Para criar o banco e realizar a população inicial:
 
 ```bash
 python fastapi/sqlite_database.py
-```
-
-Para realizar a população inicial:
-
-```bash
-python fastapi/sqlite_populate.py
 ```
 
 O arquivo `database.db` fica localizado dentro de `fastapi/` e contém usuários e predições de exemplo pertencentes a usuários diferentes.
